@@ -8,9 +8,8 @@ local function rainbowColor(speed, sat, val)
 end
 
 function RainbowUI:CreateWindow(width, height)
-    width, height = width or 230, height or 120 -- Compacto
+    width, height = width or 230, height or 120
 
-    -- GUI principal
     local sg = Instance.new("ScreenGui")
     sg.Name = "RainbowUI"
     sg.ResetOnSpawn = false
@@ -18,7 +17,6 @@ function RainbowUI:CreateWindow(width, height)
     if syn and syn.protect_gui then syn.protect_gui(sg) end
     sg.Parent = game:GetService("Players").LocalPlayer.PlayerGui
 
-    -- Frame principal
     local frame = Instance.new("Frame")
     frame.Name = "MainFrame"
     frame.Size = UDim2.new(0, width, 0, height)
@@ -26,7 +24,6 @@ function RainbowUI:CreateWindow(width, height)
     frame.BackgroundTransparency = 1
     frame.Parent = sg
 
-    -- Bordes arcoíris (compactos)
     local borders = {}
     for _,side in ipairs({"Top","Bottom","Left","Right"}) do
         local f = Instance.new("Frame")
@@ -47,7 +44,6 @@ function RainbowUI:CreateWindow(width, height)
         table.insert(borders, f)
     end
 
-    -- Fondo clásico
     local bg = Instance.new("Frame")
     bg.Name = "BG"
     bg.BackgroundColor3 = Color3.fromRGB(12, 13, 21)
@@ -57,7 +53,6 @@ function RainbowUI:CreateWindow(width, height)
     bg.ZIndex = 1
     bg.Parent = frame
 
-    -- Barra de título movible
     local bar = Instance.new("Frame")
     bar.Name = "Bar"
     bar.BackgroundColor3 = Color3.fromRGB(20, 20, 32)
@@ -66,12 +61,42 @@ function RainbowUI:CreateWindow(width, height)
     bar.Parent = bg
     bar.ZIndex = 2
 
-    -- Título fijo
+    -- Botón flotante para mostrar el HUD si está oculto
+    local floatBtn = Instance.new("TextButton")
+    floatBtn.Name = "FloatBtn"
+    floatBtn.Text = "😈"
+    floatBtn.Size = UDim2.new(0, 36, 0, 36)
+    floatBtn.Position = UDim2.new(0, 12, 0, 60)
+    floatBtn.BackgroundColor3 = Color3.fromRGB(45, 0, 55)
+    floatBtn.Visible = false
+    floatBtn.BorderSizePixel = 0
+    floatBtn.TextSize = 24
+    floatBtn.Font = Enum.Font.GothamBold
+    floatBtn.TextColor3 = Color3.fromRGB(255, 180, 255)
+    floatBtn.Parent = sg
+    floatBtn.ZIndex = 6
+
+    local devilBtn = Instance.new("TextButton")
+    devilBtn.Name = "DevilBtn"
+    devilBtn.Text = "😈"
+    devilBtn.AnchorPoint = Vector2.new(0, 0.5)
+    devilBtn.Position = UDim2.new(0, 8, 0.5, 0)
+    devilBtn.Size = UDim2.new(0, 22, 0, 22)
+    devilBtn.BackgroundColor3 = Color3.fromRGB(35, 0, 50)
+    devilBtn.BorderSizePixel = 0
+    devilBtn.TextSize = 18
+    devilBtn.Font = Enum.Font.GothamBold
+    devilBtn.TextColor3 = Color3.fromRGB(255,160,255)
+    devilBtn.Parent = bar
+    devilBtn.ZIndex = 4
+    devilBtn.AutoButtonColor = true
+
     local title = Instance.new("TextLabel")
     title.Name = "Title"
-    title.Size = UDim2.new(1, 0, 1, 0)
+    title.Size = UDim2.new(1, -60, 1, 0)
+    title.Position = UDim2.new(0, 28, 0, 0)
     title.BackgroundTransparency = 1
-    title.Text = "  SCRIPT😈LUIS"
+    title.Text = "SCRIPT😈LUIS"
     title.Font = Enum.Font.GothamBold
     title.TextSize = 19
     title.TextStrokeTransparency = 0.8
@@ -80,7 +105,21 @@ function RainbowUI:CreateWindow(width, height)
     title.Parent = bar
     title.ZIndex = 3
 
-    -- ScrollingFrame de botones
+    local hideBtn = Instance.new("TextButton")
+    hideBtn.Name = "HideBtn"
+    hideBtn.Text = "✖"
+    hideBtn.Size = UDim2.new(0, 22, 0, 22)
+    hideBtn.AnchorPoint = Vector2.new(1, 0.5)
+    hideBtn.Position = UDim2.new(1, -8, 0.5, 0)
+    hideBtn.BackgroundColor3 = Color3.fromRGB(42, 0, 20)
+    hideBtn.BorderSizePixel = 0
+    hideBtn.TextSize = 14
+    hideBtn.Font = Enum.Font.GothamBold
+    hideBtn.TextColor3 = Color3.fromRGB(255,100,100)
+    hideBtn.Parent = bar
+    hideBtn.ZIndex = 4
+    hideBtn.AutoButtonColor = true
+
     local scroll = Instance.new("ScrollingFrame")
     scroll.Name = "Options"
     scroll.Size = UDim2.new(1, -12, 1, -34)
@@ -100,14 +139,13 @@ function RainbowUI:CreateWindow(width, height)
     uiList.SortOrder = Enum.SortOrder.LayoutOrder
     uiList.Padding = UDim.new(0,4)
 
-    -- Animación arcoíris
     game:GetService("RunService").RenderStepped:Connect(function()
         for i,rf in ipairs(borders) do
             rf.BackgroundColor3 = rainbowColor(0.39 + (i*0.07), 1, 1)
         end
     end)
 
-    -- Dragging (solo barra)
+    -- Dragging
     local dragging, dragInput, dragStart, startPos
     bar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -130,9 +168,27 @@ function RainbowUI:CreateWindow(width, height)
         if dragging and input == dragInput then
             local delta = input.Position - dragStart
             frame.Position = UDim2.new(
-                startPos.X.Scale, startPos.X.Offset + delta.X,
-                startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+                0, math.clamp(startPos.X.Offset + delta.X, 0, game:GetService("Workspace").CurrentCamera.ViewportSize.X - width),
+                0, math.clamp(startPos.Y.Offset + delta.Y, 0, game:GetService("Workspace").CurrentCamera.ViewportSize.Y - height)
+            )
         end
+    end)
+
+    -- Botón para esconder el HUD
+    hideBtn.MouseButton1Click:Connect(function()
+        frame.Visible = false
+        floatBtn.Visible = true
+        floatBtn.Position = UDim2.new(0, frame.Position.X.Offset, 0, frame.Position.Y.Offset)
+    end)
+
+    -- Botón flotante "😈" (solo visible cuando HUD está escondido)
+    floatBtn.MouseButton1Click:Connect(function()
+        frame.Visible = true
+        floatBtn.Visible = false
+    end)
+
+    devilBtn.MouseButton1Click:Connect(function()
+        -- Puedes poner aquí lo que desees
     end)
 
     local api = setmetatable({
