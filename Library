@@ -182,10 +182,10 @@ function RainbowUI:CreateWindow(width, height)
     return api
 end
 
-function RainbowUI:AddButton(text, callback)
+-- Activable Button: El símbolo '✔️' solo aparece si está activado
+function RainbowUI:AddActivableButton(text, callback)
     local btn = Instance.new("TextButton")
-    btn.Text = "  "..(text or "Botón")
-    btn.Size = UDim2.new(1, -8, 0, 23)
+    btn.Size = UDim2.new(1, -8, 0, 24)
     btn.BackgroundColor3 = Color3.fromRGB(32,32,50)
     btn.BorderSizePixel = 0
     btn.Font = Enum.Font.GothamSemibold
@@ -194,8 +194,24 @@ function RainbowUI:AddButton(text, callback)
     btn.AutoButtonColor = true
     btn.ZIndex = 4
     btn.Parent = self._scroll
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.RichText = true
+    local isActive = false
+
+    local function updateText()
+        if isActive then
+            btn.Text = string.format("  %s <font color='rgb(120,255,120)' size='16'>✔️</font>", (text or "Botón"))
+        else
+            btn.Text = "  "..(text or "Botón")
+        end
+    end
+
+    updateText()
+
     btn.MouseButton1Click:Connect(function()
-        if callback then pcall(callback) end
+        isActive = not isActive
+        updateText()
+        if callback then pcall(callback, isActive) end -- Se pasa el estado al callback
     end)
     return btn
 end
