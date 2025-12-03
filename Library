@@ -76,21 +76,7 @@ function RainbowUI:CreateWindow(width, height)
     floatBtn.Parent = sg
     floatBtn.ZIndex = 6
 
-    local devilBtn = Instance.new("TextButton")
-    devilBtn.Name = "DevilBtn"
-    devilBtn.Text = "😈"
-    devilBtn.AnchorPoint = Vector2.new(0, 0.5)
-    devilBtn.Position = UDim2.new(0, 8, 0.5, 0)
-    devilBtn.Size = UDim2.new(0, 22, 0, 22)
-    devilBtn.BackgroundColor3 = Color3.fromRGB(35, 0, 50)
-    devilBtn.BorderSizePixel = 0
-    devilBtn.TextSize = 18
-    devilBtn.Font = Enum.Font.GothamBold
-    devilBtn.TextColor3 = Color3.fromRGB(255,160,255)
-    devilBtn.Parent = bar
-    devilBtn.ZIndex = 4
-    devilBtn.AutoButtonColor = true
-
+    -- Título
     local title = Instance.new("TextLabel")
     title.Name = "Title"
     title.Size = UDim2.new(1, -60, 1, 0)
@@ -145,9 +131,9 @@ function RainbowUI:CreateWindow(width, height)
         end
     end)
 
-    -- Dragging
+    -- MOVIBLE SOLO CON EL TEXTO DEL TÍTULO
     local dragging, dragInput, dragStart, startPos
-    bar.InputBegan:Connect(function(input)
+    title.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
             dragStart = input.Position
@@ -159,7 +145,7 @@ function RainbowUI:CreateWindow(width, height)
             end)
         end
     end)
-    bar.InputChanged:Connect(function(input)
+    title.InputChanged:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement then
             dragInput = input
         end
@@ -168,8 +154,8 @@ function RainbowUI:CreateWindow(width, height)
         if dragging and input == dragInput then
             local delta = input.Position - dragStart
             frame.Position = UDim2.new(
-                0, math.clamp(startPos.X.Offset + delta.X, 0, game:GetService("Workspace").CurrentCamera.ViewportSize.X - width),
-                0, math.clamp(startPos.Y.Offset + delta.Y, 0, game:GetService("Workspace").CurrentCamera.ViewportSize.Y - height)
+                0, math.clamp(startPos.X.Offset + delta.X, 0, game:GetService("Workspace").CurrentCamera.ViewportSize.X - frame.Size.X.Offset),
+                0, math.clamp(startPos.Y.Offset + delta.Y, 0, game:GetService("Workspace").CurrentCamera.ViewportSize.Y - frame.Size.Y.Offset)
             )
         end
     end)
@@ -181,14 +167,10 @@ function RainbowUI:CreateWindow(width, height)
         floatBtn.Position = UDim2.new(0, frame.Position.X.Offset, 0, frame.Position.Y.Offset)
     end)
 
-    -- Botón flotante "😈" (solo visible cuando HUD está escondido)
+    -- Botón flotante "😈"
     floatBtn.MouseButton1Click:Connect(function()
         frame.Visible = true
         floatBtn.Visible = false
-    end)
-
-    devilBtn.MouseButton1Click:Connect(function()
-        -- Puedes poner aquí lo que desees
     end)
 
     local api = setmetatable({
