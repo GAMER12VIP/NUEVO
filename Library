@@ -222,4 +222,57 @@ function RainbowUI:Destroy()
     if self._sg then self._sg:Destroy() end
 end
 
+function RainbowUI:Notify(text, duration)
+    duration = duration or 2
+    local sg = self._sg or game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("RainbowUI")
+    if not sg then return end
+    local notif = Instance.new("TextLabel")
+    notif.Text = tostring(text)
+    notif.Size = UDim2.new(0, 280, 0, 32)
+    notif.AnchorPoint = Vector2.new(0.5, 0)
+    notif.Position = UDim2.new(0.5, 0, 0, 34)
+    notif.BackgroundColor3 = Color3.fromRGB(35,35,45)
+    notif.BorderSizePixel = 0
+    notif.Font = Enum.Font.GothamSemibold
+    notif.TextSize = 16
+    notif.TextColor3 = Color3.new(1,1,1)
+    notif.TextStrokeTransparency = 0.7
+    notif.Parent = sg
+    notif.ZIndex = 999
+    notif.BackgroundTransparency = 0.18
+    notif.TextTransparency = 0
+    notif.TextStrokeColor3 = Color3.fromRGB(0,0,0)
+    notif.ClipsDescendants = true
+
+    -- Rainbow border arriba
+    local border = Instance.new("Frame")
+    border.Parent = notif
+    border.Size = UDim2.new(1,0,0,3)
+    border.Position = UDim2.new(0,0,0,0)
+    border.BackgroundColor3 = Color3.fromHSV((tick()*0.47)%1,1,1)
+    border.BorderSizePixel = 0
+    border.ZIndex = notif.ZIndex + 1
+
+    local rs = game:GetService("RunService")
+    local conn
+    conn = rs.RenderStepped:Connect(function()
+        if border.Parent then
+            border.BackgroundColor3 = Color3.fromHSV((tick()*0.47)%1,1,1)
+        else
+            conn:Disconnect()
+        end
+    end)
+
+    spawn(function()
+        wait(duration)
+        for i=1,8 do
+            notif.TextTransparency = i*0.1
+            notif.BackgroundTransparency = 0.18 + i*0.09
+            border.BackgroundTransparency = i*0.12
+            wait(0.03)
+        end
+        notif:Destroy()
+    end)
+end
+
 return RainbowUI
